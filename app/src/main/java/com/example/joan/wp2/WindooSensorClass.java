@@ -46,11 +46,12 @@ public class WindooSensorClass implements Observer {
                     double pressureValue= (double)event.getData();
                     Log.d("WindooSensorClass", "Pressure received : " + pressureValue);
 
-                    //Two ways to get the value:
+                    //Two ways to get the pressure value:
                     //activity.updatePressureUI(0,0,pressureValue);
 
                     measurement = jdcWindooManager.getLive();
                     pressureGlobal = measurement.getPressure();
+                    //Send values to UI
                     activity.updatePressureUI(0,0,pressureGlobal);
                 }
 

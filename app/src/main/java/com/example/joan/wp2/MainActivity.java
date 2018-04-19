@@ -11,7 +11,6 @@ import android.widget.TextView;
 
 /**
  * Created by joan.sansa.melsion on 18/04/2018.
- * https://gist.github.com/jdc-electronic/4eb9b585bf27e5a222da
  */
 
 public class MainActivity extends AppCompatActivity {
@@ -20,13 +19,16 @@ public class MainActivity extends AppCompatActivity {
     private TextView pressureFromPhoneTV, androidHeightTV, windooPressureTV;
     private Button windooButton, barometerButton;
 
-
+    //--------------------------------------------------------------------------
+    // LIFE CYCLE
+    //--------------------------------------------------------------------------
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //https://stackoverflow.com/questions/28539717/android-startrecording-called-on-an-uninitialized-audiorecord-when-samplerate/28539778
+        //Check audio permissions in order to use Windoo jack sensor.
+        // https://stackoverflow.com/questions/28539717/android-startrecording-called-on-an-uninitialized-audiorecord-when-samplerate/28539778
         if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.RECORD_AUDIO)
                 != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.RECORD_AUDIO},123);
@@ -40,6 +42,8 @@ public class MainActivity extends AppCompatActivity {
         windooButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                //Instantiate jdcWindooManager and start observing sensor changes
+                windooSensorClass= new WindooSensorClass(MainActivity.this);
                 windooSensorClass.start();
             }
         });
@@ -47,21 +51,31 @@ public class MainActivity extends AppCompatActivity {
         barometerButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                //Start smartphone sensor listener
+                pressureSensorClass = new PressureSensorClass(MainActivity.this);
                 pressureSensorClass.start();
             }
         });
-
-        pressureSensorClass = new PressureSensorClass(this);
-        windooSensorClass= new WindooSensorClass(this);
     }
 
     @Override
-    protected void onPause(){
-        super.onPause();
+    protected void onDestroy(){
+        super.onDestroy();
+        //Liberate sensor listeners when closing app
         pressureSensorClass.stop();
         windooSensorClass.stop();
     }
 
+    //--------------------------------------------------------------------------
+    // UI METHODS
+    //--------------------------------------------------------------------------
+
+    /**
+     * Update TextView with new pressure values from the two sources
+     * @param pressureValue
+     * @param androidHeight
+     * @param windooPressure
+     */
     public void updatePressureUI(float pressureValue, float androidHeight, double windooPressure){
         if(pressureValue == 0 && androidHeight == 0){
             windooPressureTV.setText(Double.toString(windooPressure));
