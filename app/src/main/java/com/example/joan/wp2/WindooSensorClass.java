@@ -1,6 +1,5 @@
 package com.example.joan.wp2;
 
-import android.app.Activity;
 import android.util.Log;
 
 import java.util.Observable;
@@ -46,6 +45,8 @@ public class WindooSensorClass implements Observer {
                 } else if (event.getType() == JDCWindooEvent.JDCWindooNewPressureValue) {
                     double pressureValue= (double)event.getData();
                     Log.d("WindooSensorClass", "Pressure received : " + pressureValue);
+
+                    //Two ways to get the value:
                     //activity.updatePressureUI(0,0,pressureValue);
 
                     measurement = jdcWindooManager.getLive();
