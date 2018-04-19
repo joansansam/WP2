@@ -17,7 +17,9 @@ import ch.skywatch.windoo.api.JDCWindooMeasurement;
 
 public class WindooSensorClass implements Observer {
     private JDCWindooManager jdcWindooManager;
+    private JDCWindooMeasurement measurement;
     private MainActivity activity;
+    private Double pressureGlobal;
 
     public WindooSensorClass(MainActivity activity){
         this.activity=activity;
@@ -25,7 +27,6 @@ public class WindooSensorClass implements Observer {
     }
 
     public void start(){
-        //JDCWindooMeasurement measurement = jdcWindooManager.getLive();
         jdcWindooManager.addObserver(this);
         jdcWindooManager.enable(activity);
     }
@@ -45,7 +46,11 @@ public class WindooSensorClass implements Observer {
                 } else if (event.getType() == JDCWindooEvent.JDCWindooNewPressureValue) {
                     double pressureValue= (double)event.getData();
                     Log.d("WindooSensorClass", "Pressure received : " + pressureValue);
-                    activity.updatePressureUI(0,0,pressureValue);
+                    //activity.updatePressureUI(0,0,pressureValue);
+
+                    measurement = jdcWindooManager.getLive();
+                    pressureGlobal = measurement.getPressure();
+                    activity.updatePressureUI(0,0,pressureGlobal);
                 }
 
             }
