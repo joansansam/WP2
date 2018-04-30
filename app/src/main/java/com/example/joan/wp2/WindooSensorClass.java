@@ -18,7 +18,7 @@ public class WindooSensorClass implements Observer {
     private JDCWindooManager jdcWindooManager;
     private JDCWindooMeasurement measurement;
     private MainActivity activity;
-    private Double pressureGlobal;
+    private double pressureGlobal;
 
     public WindooSensorClass(MainActivity activity){
         this.activity=activity;
@@ -51,10 +51,13 @@ public class WindooSensorClass implements Observer {
 
                     measurement = jdcWindooManager.getLive();
                     pressureGlobal = measurement.getPressure();
-                    //Send values to UI
-                    activity.updatePressureUI(0,0,pressureGlobal);
-                }
 
+                    //To check measures, save them to a file
+                    FileUtil.saveToFile(0,0,pressureGlobal);
+
+                    //Send values to UI
+                    activity.updatePressureUI(0,0, pressureValue, pressureGlobal);
+                }
             }
         });
     }

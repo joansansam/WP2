@@ -6,6 +6,7 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.CountDownTimer;
+import android.widget.Toast;
 
 /**
  * Created by joan.sansa.melsion on 18/04/2018.
@@ -16,7 +17,7 @@ public class PressureSensorClass {
     private SensorManager sensorManager = null;
     private Context context;
     private MainActivity activity;
-    private float pressureValue;
+    private double pressureValue;
     private float androidHeight;
     private boolean firstValue;
     private int n;
@@ -52,19 +53,42 @@ public class PressureSensorClass {
 
             //Check sensor type.
             if(event.sensor.getType() == Sensor.TYPE_PRESSURE) {
-                pressureValue = event.values[0];
+                pressureValue = (double)event.values[0];
                 //androidHeight = SensorManager.getAltitude(SensorManager.PRESSURE_STANDARD_ATMOSPHERE, pressureValue);
                 //activity.updatePressureUI(pressureValue, androidHeight,0);
 
-                //Temporal averaging
-                temporalAveraging(pressureValue);
+                //To check measures, save them to a file
+                FileUtil.saveToFile(pressureValue,0,0);
+
+                //Averaging and sending to UI and file
+                //ToDo: quan es decideixi no fer servir la mitjana temporal, fer el métode averaging un return double i fer l'updateUI() i saveToFile() aquí (fora del métode)
+                //temporalAveraging(pressureValue);
+                averaging(pressureValue);
             }
         }
     };
 
-    //ToDo: this code can be improved
+    //This method averages between each X (25) input values
+    private void averaging(double value){
+        acum+=value;
+        n++;
+        if(n==25){ //For every 25 measurements, get the average
+            average=acum/n;
+            androidHeight = SensorManager.getAltitude(SensorManager.PRESSURE_STANDARD_ATMOSPHERE, average);
+
+            //To check measures, save them to a file
+            FileUtil.saveToFile(0,average,0);
+
+            activity.updatePressureUI(average, androidHeight, 0,0);
+
+            n=0;
+            acum=0;
+            average=0;
+        }
+    }
+
     private float acum=0;
-    private void temporalAveraging(float value){
+    private void temporalAveraging(double value){
         acum+=value;
         n++;
         if(firstValue){
@@ -75,10 +99,16 @@ public class PressureSensorClass {
                 public void onTick(long millisUntilFinished) {}
                 @Override
                 public void onFinish() {
+                    //To know how many measures per interval is retrieving the sensor
+                    //Toast.makeText(activity.getApplicationContext(),"n= "+n,Toast.LENGTH_SHORT).show();
                     firstValue=true;
                     average=acum/n;
                     androidHeight = SensorManager.getAltitude(SensorManager.PRESSURE_STANDARD_ATMOSPHERE, average);
-                    activity.updatePressureUI(average, androidHeight, 0);
+
+                    //To check measures, save them to a file
+                    FileUtil.saveToFile(0,average,0);
+
+                    activity.updatePressureUI(average, androidHeight, 0,0);
                     average = 0;
                     n=0;
                     acum=0;
