@@ -57,8 +57,8 @@ public class PressureSensorClass {
                 //androidHeight = SensorManager.getAltitude(SensorManager.PRESSURE_STANDARD_ATMOSPHERE, pressureValue);
                 //activity.updatePressureUI(pressureValue, androidHeight,0);
 
-                //To check measures, save them to a file
-                FileUtil.saveToFile(pressureValue,0,0);
+                //To check measures, save them to a file (Try to not use this value, TOO MUCH OVERFLOW IN THE LOG FILE)
+                //FileUtil.saveToFile(pressureValue,0,0);
 
                 //Averaging and sending to UI and file
                 //ToDo: quan es decideixi no fer servir la mitjana temporal, fer el métode averaging un return double i fer l'updateUI() i saveToFile() aquí (fora del métode)
