@@ -16,9 +16,7 @@ import ch.skywatch.windoo.api.JDCWindooMeasurement;
 
 public class WindooSensorClass implements Observer {
     private JDCWindooManager jdcWindooManager;
-    private JDCWindooMeasurement measurement;
     private MainActivity activity;
-    private double pressureGlobal;
 
     public WindooSensorClass(MainActivity activity){
         this.activity=activity;
@@ -43,20 +41,20 @@ public class WindooSensorClass implements Observer {
                 if (event.getType() == JDCWindooEvent.JDCWindooAvailable) {
                     Log.d("WindooSensorClass", "Windoo available");
                 } else if (event.getType() == JDCWindooEvent.JDCWindooNewPressureValue) {
-                    double pressureValue= (double)event.getData();
-                    Log.d("WindooSensorClass", "Pressure received : " + pressureValue);
-
                     //Two ways to get the pressure value:
-                    //activity.updatePressureUI(0,0,pressureValue);
+                    double pressureEvent= (double)event.getData();
+                    JDCWindooMeasurement measurement = jdcWindooManager.getLive();
+                    double pressureValue = measurement.getPressure();
 
-                    measurement = jdcWindooManager.getLive();
-                    pressureGlobal = measurement.getPressure();
+                    Log.d("WindooSensorClass", "Pressure received : " + pressureEvent);
+
+                    double temperature= measurement.getTemperature();
 
                     //To check measures, save them to a file
-                    FileUtil.saveToFile(0,0,pressureGlobal);
+                    FileUtil.saveToFile(temperature,0,pressureEvent);
 
                     //Send values to UI
-                    activity.updatePressureUI(0,0, pressureValue, pressureGlobal);
+                    activity.updatePressureUI(0,0, pressureEvent, pressureValue);
                 }
             }
         });

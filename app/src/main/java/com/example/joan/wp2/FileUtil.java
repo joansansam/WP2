@@ -1,12 +1,16 @@
 package com.example.joan.wp2;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Environment;
+import android.text.format.DateFormat;
 import android.util.Log;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * Created by joan.sansa.melsion on 18/04/2018.
@@ -15,6 +19,8 @@ import java.io.IOException;
 public class FileUtil {
 
     private static FileOutputStream stream;
+    private static double baroAvgAux;
+    private static double fromWindooAux;
 
     public static void createFile(Context context){
         if(!Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState()))
@@ -29,7 +35,7 @@ public class FileUtil {
 
         try {
             stream = new FileOutputStream(file);
-            String sequence= "timestamp(sec) fromBarometre baroAvg fromWindoo \n";
+            String sequence= "date temperature baroAvg fromWindoo \n";
             stream.write(sequence.getBytes());
             //stream.close();
         } catch (IOException e) {
@@ -39,13 +45,22 @@ public class FileUtil {
         }
     }
 
-    public static void saveToFile(double fromBarometer, double baroAvg, double fromWindoo){
+    public static void saveToFile(double temperature, double baroAvg, double fromWindoo){
         try {
-            long timestamp = System.currentTimeMillis()/1000;
+            if(baroAvg==0){
+                fromWindooAux=fromWindoo;
+            } else if(fromWindoo==0) {
+                baroAvgAux = baroAvg;
+            }
+            if(fromWindooAux!=0 && baroAvgAux!=0) {
+                String date = DateFormat.format("dd/MM/yyyy-HH:mm:ss", new java.util.Date()).toString();
 
-            String sequence= timestamp+" "+fromBarometer+" "+baroAvg+" "+ fromWindoo +"\n";
-            stream.write(sequence.replace(".",",").getBytes());
-            //stream.close();
+                String sequence = date + " " + temperature + " " + baroAvgAux + " " + fromWindooAux + "\n";
+                stream.write(sequence.replace(".", ",").getBytes());
+                //stream.close();
+                fromWindooAux=0;
+                baroAvgAux=0;
+            }
         } catch (IOException e) {
             e.printStackTrace();
             Log.e("FileUtil", "PROBLEMS SAVING TO FILE");
