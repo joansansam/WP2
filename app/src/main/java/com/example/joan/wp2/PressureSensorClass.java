@@ -54,6 +54,7 @@ public class PressureSensorClass {
             //Check sensor type.
             if(event.sensor.getType() == Sensor.TYPE_PRESSURE) {
                 pressureValue = (double)event.values[0];
+                //For testing
                 //androidHeight = SensorManager.getAltitude(SensorManager.PRESSURE_STANDARD_ATMOSPHERE, pressureValue);
                 //activity.updatePressureUI(pressureValue, androidHeight,0);
 
@@ -61,7 +62,6 @@ public class PressureSensorClass {
                 //FileUtil.saveToFile(0,pressureValue,0);
 
                 //Averaging and sending to UI and file
-                //ToDo: quan es decideixi no fer servir la mitjana temporal, fer el métode averaging un return double i fer l'updateUI() i saveToFile() aquí (fora del métode)
                 //temporalAveraging(pressureValue);
                 averaging(pressureValue);
             }
